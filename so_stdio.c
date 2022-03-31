@@ -98,27 +98,17 @@ FUNC_DECL_PREFIX int so_fclose(SO_FILE *stream) {
 
 FUNC_DECL_PREFIX int so_fgetc(SO_FILE *stream) {
     /* Cand citesc citesc din buffer un caracter doar daca are ceva in el, altfel, il populez */
-    if(strlen(stream->read_buffer) == 0) { /* verifica daca am ceva in buffer */
-    /* TODO BUCLA DE CITIRE PANA LA BUFF_SIZE) */
-        int bytes_read = 0;
-        while(bytes_read < BUFF_SIZE ) {
-            int rc =  read(stream->file_des, 
-                stream->read_buffer + bytes_read, 
-                BUFF_SIZE - bytes_read);
-            if(rc < 0)
-                return SO_EOF;
-            if(rc == 0)
-                break;
-            printf("%d\n", rc);
-            bytes_read += rc;     
-        } 
+    if(strlen(stream->read_buffer) == 0) {
+        int rc = read(stream->file_des, stream->read_buffer, BUFF_SIZE);
+        if(rc < 0)
+            return SO_EOF;
     }
-
-    unsigned char read_caracter = stream->read_buffer[0]; /* extrag primul caracter */
-    //stream->read_buffer = realloc(stream->read_buffer + 1, BUFF_SIZE * sizeof(char)); /* elimin primul caracter din buffer */ 
+    
+    unsigned char c = stream->read_buffer[0];
     strcpy(stream->read_buffer, stream->read_buffer + 1);
+    
+    return (int) c;
 
-    return (int) read_caracter; /* returnez caracterul extins la int */
 }
 
 /* Functia de scriere a unui caracter (primit ca numar intreg) intr un fisier */
@@ -179,13 +169,15 @@ FUNC_DECL_PREFIX int so_pclose(SO_FILE *stream) {
 
 int main(int argc, char* argv[]) {
 
-   /* SO_FILE* inputFile = so_fopen("cez.txt", "r");
+    SO_FILE* inputFile = so_fopen("cez.txt", "r");
     printf("%d\n" , inputFile->file_des);
     char *s = malloc(100*sizeof(char));
     int rc = so_fgetc(inputFile);
     printf("%c\n", rc);
+    rc = so_fgetc(inputFile);
+        printf("%c\n", rc);
 
-    so_fclose(inputFile); */
+    so_fclose(inputFile); 
     
 
     return 0;
