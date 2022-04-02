@@ -30,21 +30,20 @@ int getFlags(const char* mode) {
     } else if(strcmp(mode, "r+") == 0) {
         return O_RDWR;
     } else if(strcmp(mode, "w")  == 0) {
-        return O_CREAT | O_TRUNC | O_WRONLY;
+        return (O_WRONLY | O_CREAT | O_TRUNC) ;
     } else if(strcmp(mode, "w+") == 0) {
-        return O_CREAT | O_TRUNC | O_RDWR;
+        return (O_RDWR | O_CREAT | O_TRUNC) ;
     } else if(strcmp(mode, "a")  == 0) {
-        return O_CREAT | O_APPEND | O_WRONLY;
+        return (O_WRONLY | O_CREAT | O_APPEND)  ;
     } else if(strcmp(mode, "a+") == 0) {
-        return O_CREAT | O_APPEND | O_RDWR;
+        return (O_RDWR | O_CREAT | O_APPEND) ;
     }
-
     return -1;
 }
 /* functia pentru deschiderea fisierului */
 
 FUNC_DECL_PREFIX SO_FILE *so_fopen(const char* pathname, const char* mode) {
-    SO_FILE* file = malloc(sizeof(SO_FILE));
+    SO_FILE* file = (SO_FILE *) malloc(sizeof(SO_FILE));
     file->pathname = strdup(pathname);
     file->mode = strdup(mode);
     
@@ -55,8 +54,6 @@ FUNC_DECL_PREFIX SO_FILE *so_fopen(const char* pathname, const char* mode) {
     file-> write_buffer = (char*) malloc(BUFF_SIZE * sizeof(char));  /* scriere */
     memset(file->write_buffer, '\0', sizeof(file->write_buffer)); /* initializez cu 0 */
     
-    int flags;
-
     if((strcmp(mode, "w") == 0) || (strcmp(mode, "w+") == 0) ||
         (strcmp(mode, "a") == 0) || (strcmp(mode, "a+") == 0)) /* dehide fisierul cu permisiuni */
         file->file_des = open(file->pathname, getFlags(file->mode), 0644);
@@ -86,8 +83,9 @@ FUNC_DECL_PREFIX int so_fclose(SO_FILE *stream) {
     free(stream->write_buffer); /* eliberez memoria bufferului de scriere */
 
     int close_result = close (stream->file_des); /* inchid file_des */
+    free(stream); /* dezaloc memoria pt FILE */
+
     if(close_result == 0) { /* in caz ca inchiderea fisierului a fost cu succes */
-        free(stream); /* dezaloc memoria pt FILE */
         return 0;
     } else
         return SO_EOF; /* presupun ca e -1 */
@@ -165,7 +163,7 @@ FUNC_DECL_PREFIX int so_pclose(SO_FILE *stream) {
     return 0; //TODO
 }
 
-
+/*
 int main(int argc, char* argv[]) {
 
     SO_FILE* inputFile = so_fopen("cez.txt", "r");
@@ -178,6 +176,6 @@ int main(int argc, char* argv[]) {
 
     so_fclose(inputFile); 
     
-
     return 0;
 }
+*/
