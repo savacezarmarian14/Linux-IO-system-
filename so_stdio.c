@@ -50,11 +50,10 @@ FUNC_DECL_PREFIX SO_FILE *so_fopen(const char* pathname, const char* mode) {
     
     /* aloc memorie pentru bufferele de i/o (buffering) */
     file->read_buffer   = (char*) malloc(BUFF_SIZE * sizeof(char)); /* citire */
-    memset(file->read_buffer, 0, sizeof(file->read_buffer)); /* initializez cu 0 */
+    memset(file->read_buffer, '\0', sizeof(file->read_buffer)); /* initializez cu 0 */
 
     file-> write_buffer = (char*) malloc(BUFF_SIZE * sizeof(char));  /* scriere */
-    memset(file->write_buffer, 0, sizeof(file->write_buffer)); 
-
+    memset(file->write_buffer, '\0', sizeof(file->write_buffer)); /* initializez cu 0 */
     
     int flags;
 
